@@ -1,0 +1,16 @@
+{
+  "name": "youtube-backend-project",
+  "version": "1.0.0",
+  "description": "This is the clone of Youtube Backend.",
+  "keywords": [
+    "javascript",
+    "backend"
+  ],
+  "license": "ISC",
+  "author": "Mudasir Iqbal",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "echo \"Error: no test specified\" && exit 1"
+  }
+}
