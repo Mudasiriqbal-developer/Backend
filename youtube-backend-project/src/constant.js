@@ -1,2 +1,2 @@
-export const DB_NAME =  "xyz"
+export const DB_NAME =  "youtube"
 

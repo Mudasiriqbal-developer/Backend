@@ -5,7 +5,7 @@ const connectDB = async () => {
   try {
     console.log(process.env.MONGO_URI)
     const connectionInstance = await mongoose.connect(
-      `${process.env.MONGO_URI}/xyz`,
+      `${process.env.MONGO_URI}/youtube`,
     );
     console.log("connection", connectionInstance);
     console.log(
