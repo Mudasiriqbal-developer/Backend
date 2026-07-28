@@ -39,20 +39,20 @@ router.route("/refresh-token").post(refreshAccessToken);
 
 router.route("/change-password").post(verifyJWT, changeCurrentPassword);
 
-router.routes("/current-user").get(verifyJWT, updateAccountDetail);
+router.route("/current-user").get(verifyJWT, updateAccountDetail);
 
-router.routes("/update-account").patch(verifyJWT, updateAccountDetail);
+router.route("/update-account").patch(verifyJWT, updateAccountDetail);
 
 router
-  .routes("/avatar")
+  .route("/avatar")
   .patch(verifyJWT, upload.single("avatar"), updateUserAvatar);
 
 router
-  .routes("/cover-image")
+  .route("cover-image")
   .patch(verifyJWT, upload.single("coverImage"), updateUserCoverImage);
 
-router.routes("/c/:username").get(verifyJWT, getUserChannelProfile);
+router.route("/c/:username").get(verifyJWT, getUserChannelProfile);
 
-router.routes("/history").get(verifyJWT, getWatchHistory);
+router.route("/history").get(verifyJWT, getWatchHistory);
 
 export default router;
