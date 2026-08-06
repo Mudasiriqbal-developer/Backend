@@ -235,6 +235,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
  }
 })
 
+// Change Current User Password
 const changeCurrentPassword = asyncHandler(async(req, res) => {
   const {oldPassword, newPassword} = req.dody
 
@@ -254,12 +255,14 @@ const changeCurrentPassword = asyncHandler(async(req, res) => {
   }
 })
 
+// Access Current User
 const getCurrentUser = asyncHandler(async(req, res) => {
   return res
   .status(200)
   .json(200, req.user, "Current user fathed successfully")
 })
 
+// Update Account Detail
 const updateAccountDetail = asyncHandler(async(req, res) => {
   const {fullName, email} = req.body
 
@@ -283,6 +286,7 @@ const updateAccountDetail = asyncHandler(async(req, res) => {
   .json(new ApiResponse(200, user, "Account detail update successfully"))
 })
 
+// Update User Avatar
 const updateUserAvatar = asyncHandler(async(req, res) => {
 
   const avatarLocalPath = req.file?.path
@@ -314,6 +318,7 @@ const updateUserAvatar = asyncHandler(async(req, res) => {
   )
 })
 
+// Update User Cover Image
 const updateUserCoverImage = asyncHandler(async(req, res) => {
 
   const coverImageLocalPath = req.file?.path
@@ -345,6 +350,7 @@ const updateUserCoverImage = asyncHandler(async(req, res) => {
   )
 })
 
+// Get User Channel profile
 const getUserChannelProfile = asyncHandler(async(req, res) => {
 
   const { username } = req.params
@@ -417,6 +423,7 @@ const getUserChannelProfile = asyncHandler(async(req, res) => {
   )
 })
 
+// Access Watch History
 const getWatchHistory = asyncHandler(async(req, res) => {
   const user = await User.aggregate([
     {
