@@ -83,13 +83,3 @@ Contributions are welcome. Open an issue or send a PR with a focused change. Kee
 ## License & author
 
 This project is provided as-is. Author: Mudasir Iqbal.
-
----
-
-If you want, I can also:
-
-- Add example Postman collection or cURL examples
-- Document each API route with request/response examples
-- Add a `.env.example` file
-
-Tell me which next step you prefer.
