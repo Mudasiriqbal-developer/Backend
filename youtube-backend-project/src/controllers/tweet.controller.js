@@ -6,7 +6,7 @@ import {ApiResponse} from "../utils/ApiResponse.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
 
 const createTweet = asyncHandler(async (req, res) => {
-    //TODO: create tweet
+    const { content } = req.body
 
     if(!content || !content.trim()) {
         throw new ApiError(400, "Tweet Content is Reauired")
@@ -23,7 +23,7 @@ const createTweet = asyncHandler(async (req, res) => {
 })
 
 const getUserTweets = asyncHandler(async (req, res) => {
-    // TODO: get user tweets
+    const { userId } = req.params
 
     if(!isValidObjectId(userId)) {
         throw new ApiError(400, "Invalid userId")
@@ -37,7 +37,7 @@ const getUserTweets = asyncHandler(async (req, res) => {
 
     const tweets = await Tweet.find({ owner: userId })
     .sort({ createdAt: -1})
-    .populate("Owner", "username fullName avatar")
+    .populate("owner", "userName fullName avatar")
     .lean()
 
     return res.status(200).json(

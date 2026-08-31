@@ -7,30 +7,31 @@ import {ApiResponse} from "../utils/ApiResponse.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
 
 const getChannelStats = asyncHandler(async (req, res) => {
-    // TODO: Get the channel stats like total video views, total subscribers, total videos, total likes etc.
+    const channelId = req.user?._id;
+
     const [ videoStats, totalSubscribers ] = await Promise.all([
         Video.aggregate([
-            { $match: { owner: channelId} },
+            { $match: { owner: new mongoose.Types.ObjectId(channelId) } },
             {
                 $group: {
-                    tatalVideo: { $sum: 1 },
+                    _id: null,
+                    totalVideos: { $sum: 1 },
                     totalViews: { $sum: "$views" },
                     videoIds: { $push: "$_id" },
                 }
             },
         ]),
-        Subscription.countDocuments({ channel: channel }),
-
+        Subscription.countDocuments({ channel: channelId }),
     ]);
 
-    const state = videoState[0] || {
-        totalVideo: 0,
+    const stats = videoStats[0] || {
+        totalVideos: 0,
         totalViews: 0,
         videoIds: [],
     };
 
     const totalLikes = await Like.countDocuments({ 
-        video: { $in: videoStats.videoIds } 
+        video: { $in: stats.videoIds } 
     });
 
     return res.status(200)
@@ -38,7 +39,7 @@ const getChannelStats = asyncHandler(async (req, res) => {
         new ApiResponse(
             200,
             {
-                totalVideo: stats.totalVideo,
+                totalVideos: stats.totalVideos,
                 totalViews: stats.totalViews,
                 totalLikes: totalLikes,
                 totalSubscribers: totalSubscribers,
@@ -49,9 +50,7 @@ const getChannelStats = asyncHandler(async (req, res) => {
 })
 
 const getChannelVideos = asyncHandler(async (req, res) => {
-    // TODO: Get all the videos uploaded by the channel
-
-    const videos = await Video.find({ owner: req.users._id })
+    const videos = await Video.find({ owner: req.user?._id })
     .sort({ createdAt: -1 })
     .lean();
 

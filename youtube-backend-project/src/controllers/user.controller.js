@@ -237,29 +237,31 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
 // Change Current User Password
 const changeCurrentPassword = asyncHandler(async(req, res) => {
-  const {oldPassword, newPassword} = req.dody
+  const {oldPassword, newPassword} = req.body
 
-  const user = await user.findById(req.user?._id)
+  const user = await User.findById(req.user?._id)
 
   const isPasswordCorrect = await user.isPasswordCorrect(oldPassword)
 
   if (!isPasswordCorrect) {
-    throw new ApiError(400, "Incorrect new password")
-
-    user.password = newPassword
-    await user.save({validateBeforeSave: false})
-
-    return res
-    .status(200)
-    .json(new ApiResponse(200, {}, "Password change successfully"))
+    throw new ApiError(400, "Incorrect old password")
   }
+
+  user.password = newPassword
+  await user.save({validateBeforeSave: false})
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Password changed successfully"))
 })
 
 // Access Current User
 const getCurrentUser = asyncHandler(async(req, res) => {
   return res
   .status(200)
-  .json(200, req.user, "Current user fathed successfully")
+  .json(
+    new ApiResponse(200, req.user, "Current user fetched successfully")
+  )
 })
 
 // Update Account Detail
@@ -271,11 +273,11 @@ const updateAccountDetail = asyncHandler(async(req, res) => {
   }
 
   const user = await User.findByIdAndUpdate(
-    req.body?._id,
+    req.user?._id,
     {
       $set: {
         fullName,
-      email: email
+        email: email
       }
     },
     {new: true}
@@ -283,7 +285,7 @@ const updateAccountDetail = asyncHandler(async(req, res) => {
 
   return res
   .status(200)
-  .json(new ApiResponse(200, user, "Account detail update successfully"))
+  .json(new ApiResponse(200, user, "Account details updated successfully"))
 })
 
 // Update User Avatar
@@ -362,7 +364,7 @@ const getUserChannelProfile = asyncHandler(async(req, res) => {
   const channel = await User.aggregate([
     {
       $match: {
-        username: username?.toLowerCase()
+        userName: username?.toLowerCase()
       }
     },
     {
@@ -401,7 +403,7 @@ const getUserChannelProfile = asyncHandler(async(req, res) => {
     {
       $project: {
         fullName: 1,
-        username: 1,
+        userName: 1,
         subscriberCount: 1,
         channelSubscribedToCount: 1,
         isSubscribed: 1,
@@ -448,7 +450,7 @@ const getWatchHistory = asyncHandler(async(req, res) => {
                 {
                   $project: {
                     fullName: 1,
-                    username: 1,
+                    userName: 1,
                     avatar: 1
                   }
                 }
@@ -472,7 +474,7 @@ const getWatchHistory = asyncHandler(async(req, res) => {
   .json(
     new ApiResponse(
       200,
-      user[0].WatchHistory,
+      user[0]?.watchHistory || [],
       "Wath History Fatched Successfully"
     )
   )

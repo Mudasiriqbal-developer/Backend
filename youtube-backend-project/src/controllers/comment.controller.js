@@ -5,7 +5,6 @@ import {ApiResponse} from "../utils/ApiResponse.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
 
 const getVideoComments = asyncHandler(async (req, res) => {
-    //TODO: get all comments for a video
     const {videoId} = req.params
     const {page = 1, limit = 10} = req.query
 
@@ -17,14 +16,14 @@ const getVideoComments = asyncHandler(async (req, res) => {
     const lim = Math.max(1, parseInt(limit, 10));
     const skip = (pageNumber - 1) * lim;
 
-    const filter = {videoId: videoId}
+    const filter = {video: videoId}
 
     const [comments, total] = await Promise.all([
         Comment.find(filter)
         .sort({createdAt: -1})
         .skip(skip)
         .limit(lim)
-        .populate("userId", "name email")
+        .populate("owner", "fullName userName email avatar")
         .lean(),
         Comment.countDocuments(filter)
     ])
@@ -44,8 +43,6 @@ const getVideoComments = asyncHandler(async (req, res) => {
 })
 
 const addComment = asyncHandler(async (req, res) => {
-    // TODO: add a comment to a video
-
     const { videoId } = req.params
     const { content } = req.body
 
@@ -70,10 +67,15 @@ const addComment = asyncHandler(async (req, res) => {
 })
 
 const updateComment = asyncHandler(async (req, res) => {
-    // TODO: update a comment
+    const { commentId } = req.params
+    const { content } = req.body
 
     if(!mongoose.isValidObjectId(commentId)) {
         throw new ApiError(400, "Invalid commentId")
+    }
+
+    if(!content || !content.trim()) {
+        throw new ApiError(400, "Comment Content can not be empty")
     }
 
     const comment = await Comment.findById(commentId)
@@ -82,12 +84,11 @@ const updateComment = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Comment not found")
     }
 
-    if(content !== undefined) {
-        if(!content || !content.trim()) {
-            throw new ApiError(400, "Comment Content can not be empty")
-        }
+    if(comment.owner.toString() !== req.user?._id.toString()) {
+        throw new ApiError(403, "You are not authorized to update this comment")
     }
 
+    comment.content = content.trim()
     await comment.save()
 
     return res.status(200)
@@ -97,7 +98,7 @@ const updateComment = asyncHandler(async (req, res) => {
 })
 
 const deleteComment = asyncHandler(async (req, res) => {
-    // TODO: delete a comment
+    const { commentId } = req.params
 
     if(!mongoose.isValidObjectId(commentId)) {
         throw new ApiError(400, "Invalid commentId")
@@ -117,7 +118,7 @@ const deleteComment = asyncHandler(async (req, res) => {
 
     return res.status(200)
     .json(
-        new ApiResponse(200, null, { deleteCommentId: commentId }, "Comment deleted successfully")
+        new ApiResponse(200, { deleteCommentId: commentId }, "Comment deleted successfully")
     )
 })
 
